@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J2K Accounting - Australian Tax Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .result-card {
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+            max-height: 0;
+            overflow: hidden;
+        }
+        .result-card.show {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 1200px; /* Increased for more content */
+        }
+        #printBtn {
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-6 sm:py-12">
+    <div class="w-full max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg my-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600">J2K Accounting</h1>
+            <p class="text-gray-500 mt-2">Your Trusted Partner in Tax & Accounting</p>
+        </div>
+
+        <!-- Input Form -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input type="text" id="fullName" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+            <div>
+                <label for="occupation" class="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
+                <input type="text" id="occupation" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+             <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+            <div>
+                <label for="contactNumber" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                <input type="tel" id="contactNumber" placeholder="04XX XXX XXX" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+            <div>
+                <label for="financialYear" class="block text-sm font-medium text-gray-700 mb-1">Financial Year</label>
+                <select id="financialYear" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="2024-2025">2024-2025</option>
+                    <option value="2023-2024">2023-2024</option>
+                </select>
+            </div>
+            <div>
+                <label for="residency" class="block text-sm font-medium text-gray-700 mb-1">Residency Status</label>
+                <select id="residency" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="resident">Permanent Resident/Citizen</option>
+                    <option value="temporary">Temporary Resident</option>
+                </select>
+            </div>
+            <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="grossSalary" class="block text-sm font-medium text-gray-700 mb-1">Gross Annual Salary ($)</label>
+                    <input type="number" id="grossSalary" placeholder="e.g., 80000" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label for="payg" class="block text-sm font-medium text-gray-700 mb-1">Total PAYG Withheld ($)</label>
+                    <input type="number" id="payg" placeholder="e.g., 18000" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button id="calculateBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition duration-300">
+                Calculate Estimate
+            </button>
+            <button id="printBtn" class="w-full bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 transition duration-300">
+                Generate PDF Summary
+            </button>
+        </div>
+
+        <!-- Results Display -->
+        <div id="results" class="mt-8 pt-6 border-t border-gray-200 result-card">
+             <h2 class="text-2xl font-bold text-gray-800 mb-4">Calculation Results</h2>
+             <div class="space-y-3">
+                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                     <span class="text-gray-600">Basic Income Tax:</span>
+                     <span id="taxPayable" class="font-semibold text-gray-800">$0.00</span>
+                 </div>
+                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                     <span class="text-gray-600">Low Income Tax Offset:</span>
+                     <span id="lito" class="font-semibold text-green-600">-$0.00</span>
+                 </div>
+                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                     <span class="text-gray-600">Medicare Levy (2%):</span>
+                     <span id="medicareLevy" class="font-semibold text-gray-800">$0.00</span>
+                 </div>
+                 <div class="flex justify-between items-center bg-blue-100 p-4 rounded-lg">
+                     <span class="font-bold text-blue-800">Total Tax Liability:</span>
+                     <span id="totalTax" class="font-bold text-xl text-blue-800">$0.00</span>
+                 </div>
+                  <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg mt-4">
+                     <span class="text-gray-600">PAYG Withheld:</span>
+                     <span id="paygWithheld" class="font-semibold text-gray-800">-$0.00</span>
+                 </div>
+             </div>
+             <div id="finalResult" class="mt-6 p-5 rounded-lg text-center">
+                 <!-- Result will be injected here -->
+             </div>
+        </div>
+        <div id="error-message" class="mt-4 text-center text-red-500 font-medium"></div>
+
+        <!-- Footer -->
+        <div class="mt-10 pt-6 border-t border-gray-200 text-center text-gray-500">
+            <h3 class="text-lg font-semibold text-gray-700">Contact J2K Accounting</h3>
+            <p class="mt-2 text-sm">For professional advice on your tax and accounting needs, get in touch with us.</p>
+            <div class="mt-4 flex justify-center items-center flex-wrap gap-x-6 gap-y-2">
+                <a href="http://www.j2kaccounting.com.au" target="_blank" class="hover:text-blue-600"><i class="fas fa-globe mr-1"></i> www.j2kaccounting.com.au</a>
+                <a href="https://wa.me/61469703058" target="_blank" class="hover:text-blue-600"><i class="fab fa-whatsapp mr-1"></i> 0469 703 058</a>
+                <a href="https://facebook.com/j2kaccounting" target="_blank" class="hover:text-blue-600"><i class="fab fa-facebook mr-1"></i> j2kaccounting</a>
+                <a href="mailto:jet@j2kaccounting.com.au" class="hover:text-blue-600"><i class="fas fa-envelope mr-1"></i> info@j2kaccounting.com.au</a>
+            </div>
+             <p class="text-xs mt-4">Rooty Hill NSW 2766</p>
+        </div>
+    </div>
+
+    <script>
+        const calculateBtn = document.getElementById('calculateBtn');
+        const printBtn = document.getElementById('printBtn');
+        let finalAmountForPdf = 0; // Store final amount for PDF
+
+        const formatCurrency = (value) => Math.abs(value).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
+
+        calculateBtn.addEventListener('click', function() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = '';
+            const grossSalary = parseFloat(document.getElementById('grossSalary').value);
+            const payg = parseFloat(document.getElementById('payg').value);
+            const residency = document.getElementById('residency').value;
+            const financialYear = document.getElementById('financialYear').value;
+            const resultsDiv = document.getElementById('results');
+
+            if (isNaN(grossSalary) || isNaN(payg) || grossSalary < 0 || payg < 0) {
+                 errorDiv.textContent = 'Please enter valid positive numbers for salary and PAYG.';
+                 resultsDiv.classList.remove('show');
+                 printBtn.style.display = 'none';
+                 return;
+            }
+
+            let taxPayable = 0;
+            if (financialYear === '2024-2025') {
+                if (grossSalary > 18200) {
+                    if (grossSalary <= 45000) taxPayable = (grossSalary - 18200) * 0.16;
+                    else if (grossSalary <= 135000) taxPayable = 4288 + (grossSalary - 45000) * 0.30;
+                    else if (grossSalary <= 190000) taxPayable = 31288 + (grossSalary - 135000) * 0.37;
+                    else taxPayable = 51638 + (grossSalary - 190000) * 0.45;
+                }
+            } else { // 2023-2024
+                if (grossSalary > 18200) {
+                    if (grossSalary <= 45000) taxPayable = (grossSalary - 18200) * 0.19;
+                    else if (grossSalary <= 120000) taxPayable = 5092 + (grossSalary - 45000) * 0.325;
+                    else if (grossSalary <= 180000) taxPayable = 29467 + (grossSalary - 120000) * 0.37;
+                    else taxPayable = 51667 + (grossSalary - 180000) * 0.45;
+                }
+            }
+
+            let lito = 0;
+            if (grossSalary <= 37500) lito = 700;
+            else if (grossSalary <= 45000) lito = 700 - (grossSalary - 37500) * 0.05;
+            else if (grossSalary <= 66667) lito = 325 - (grossSalary - 45000) * 0.015;
+            lito = Math.max(0, lito);
+
+            let medicareLevy = 0;
+            if (residency === 'resident') {
+                 const medicareThresholdLower = 24276;
+                 const medicareThresholdUpper = 30345;
+                 if (grossSalary > medicareThresholdLower && grossSalary <= medicareThresholdUpper) medicareLevy = (grossSalary - medicareThresholdLower) * 0.10;
+                 else if (grossSalary > medicareThresholdUpper) medicareLevy = grossSalary * 0.02;
+            }
+
+            const totalTaxLiability = Math.max(0, taxPayable - lito) + medicareLevy;
+            finalAmountForPdf = totalTaxLiability - payg;
+
+            document.getElementById('taxPayable').textContent = formatCurrency(taxPayable);
+            document.getElementById('lito').textContent = `- ${formatCurrency(lito)}`;
+            document.getElementById('medicareLevy').textContent = formatCurrency(medicareLevy);
+            document.getElementById('totalTax').textContent = formatCurrency(totalTaxLiability);
+            document.getElementById('paygWithheld').textContent = `- ${formatCurrency(payg)}`;
+
+            const finalResultDiv = document.getElementById('finalResult');
+            if (finalAmountForPdf < 0) {
+                finalResultDiv.className = 'mt-6 p-5 rounded-lg text-center bg-green-100 text-green-800';
+                finalResultDiv.innerHTML = `<p class="text-lg">Estimated Tax Refund</p><p class="text-4xl font-bold">${formatCurrency(finalAmountForPdf)}</p>`;
+            } else {
+                finalResultDiv.className = 'mt-6 p-5 rounded-lg text-center bg-red-100 text-red-800';
+                finalResultDiv.innerHTML = `<p class="text-lg">Estimated Tax Payable</p><p class="text-4xl font-bold">${formatCurrency(finalAmountForPdf)}</p>`;
+            }
+
+            resultsDiv.classList.add('show');
+            printBtn.style.display = 'block';
+        });
+
+        printBtn.addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const fullName = document.getElementById('fullName').value || 'N/A';
+            const occupation = document.getElementById('occupation').value || 'N/A';
+            const email = document.getElementById('email').value || 'N/A';
+            const contactNumber = document.getElementById('contactNumber').value || 'N/A';
+            const financialYear = document.getElementById('financialYear').value;
+            const residencySelect = document.getElementById('residency');
+            const residency = residencySelect.options[residencySelect.selectedIndex].text;
+            const grossSalaryVal = parseFloat(document.getElementById('grossSalary').value);
+            const paygVal = parseFloat(document.getElementById('payg').value);
+            const grossSalary = isNaN(grossSalaryVal) ? '$0.00' : formatCurrency(grossSalaryVal);
+            const payg = isNaN(paygVal) ? '$0.00' : formatCurrency(paygVal);
+
+            const taxPayable = document.getElementById('taxPayable').textContent;
+            const lito = document.getElementById('lito').textContent;
+            const medicareLevy = document.getElementById('medicareLevy').textContent;
+            const totalTax = document.getElementById('totalTax').textContent;
+            
+            let finalResultText = finalAmountForPdf < 0 ? "Estimated Tax Refund:" : "Estimated Tax Payable:";
+            let finalResultAmount = formatCurrency(finalAmountForPdf);
+
+            // --- PDF Header ---
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor('#1D4ED8'); // Blue-600
+            doc.text("J2K Accounting", 105, 20, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.setFont("helvetica", "normal");
+            doc.text("Your Trusted Partner in Tax & Accounting", 105, 27, { align: 'center' });
+
+            // --- PDF Content ---
+            doc.setFontSize(16);
+            doc.setTextColor(0);
+            doc.text("Tax Calculation Summary", 20, 45);
+            doc.setLineWidth(0.2);
+            doc.line(20, 47, 190, 47);
+
+            doc.setFontSize(11);
+            doc.text(`Full Name: ${fullName}`, 20, 57);
+            doc.text(`Occupation: ${occupation}`, 120, 57);
+            doc.text(`Email: ${email}`, 20, 64);
+            doc.text(`Contact No: ${contactNumber}`, 120, 64);
+            doc.text(`Financial Year: ${financialYear}`, 20, 71);
+            doc.text(`Residency Status: ${residency}`, 120, 71);
+            doc.text(`Gross Annual Salary: ${grossSalary}`, 20, 78);
+            doc.text(`PAYG Withheld: ${payg}`, 120, 78);
+
+            doc.setFontSize(14);
+            doc.text("Calculation Breakdown", 20, 97);
+            doc.line(20, 99, 190, 99); 
+
+            doc.setFontSize(11);
+            doc.text(`Basic Income Tax:`, 20, 107);
+            doc.text(taxPayable, 190, 107, { align: 'right' });
+            doc.text(`Low Income Tax Offset:`, 20, 114);
+            doc.text(lito, 190, 114, { align: 'right' });
+            doc.text(`Medicare Levy:`, 20, 121);
+            doc.text(medicareLevy, 190, 121, { align: 'right' });
+
+            doc.line(20, 127, 190, 127);
+            
+            doc.setFont("helvetica", "bold");
+            doc.text(`Total Tax Liability:`, 20, 134);
+            doc.text(totalTax, 190, 134, { align: 'right' });
+            doc.setFont("helvetica", "normal");
+            doc.text(`Less PAYG Withheld:`, 20, 141);
+            doc.text(document.getElementById('paygWithheld').textContent, 190, 141, { align: 'right' });
+
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.line(20, 152, 190, 152);
+
+            if (finalAmountForPdf < 0) doc.setTextColor(22, 163, 74); // Green
+            else doc.setTextColor(220, 38, 38); // Red
+            doc.text(finalResultText, 20, 160);
+            doc.text(finalResultAmount, 190, 160, { align: 'right' });
+            doc.setTextColor(0); // Reset color
+
+            // --- PDF Footer ---
+            doc.setLineWidth(0.5);
+            doc.line(20, 260, 190, 260);
+            doc.setFontSize(9);
+            doc.setTextColor(100);
+            doc.text("www.j2kaccounting.com.au | 0469 703 058 | jet@j2kaccounting.com.au", 105, 265, { align: 'center' });
+            doc.text("Rooty Hill NSW 2766", 105, 270, { align: 'center' });
+            doc.setFont("helvetica", "bolditalic");
+            doc.text("This is an estimate only and does not constitute financial advice. Please contact J2K Accounting for a formal consultation.", 105, 280, { align: 'center' });
+
+            doc.save(`J2K-Accounting-Tax-Summary-${fullName.replace(/ /g, '_') || 'Estimate'}.pdf`);
+        });
+    </script>
+</body>
+</html>
