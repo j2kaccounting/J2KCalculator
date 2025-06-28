@@ -22,10 +22,19 @@
         .result-card.show {
             opacity: 1;
             transform: translateY(0);
-            max-height: 1200px; /* Increased for more content */
+            max-height: 1200px;
         }
         #printBtn {
             display: none; /* Initially hidden */
+        }
+        /* Styles for the new MLS accordion */
+        .accordion-content-mls {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .arrow-mls {
+            transition: transform 0.2s ease-in-out;
         }
     </style>
 </head>
@@ -38,45 +47,94 @@
         </div>
 
         <!-- Input Form -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" id="fullName" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-            </div>
-            <div>
-                <label for="occupation" class="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
-                <input type="text" id="occupation" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-            </div>
-             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-            </div>
-            <div>
-                <label for="contactNumber" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                <input type="tel" id="contactNumber" placeholder="04XX XXX XXX" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-            </div>
-            <div>
-                <label for="financialYear" class="block text-sm font-medium text-gray-700 mb-1">Financial Year</label>
-                <select id="financialYear" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    <option value="2024-2025">2024-2025</option>
-                    <option value="2023-2024">2023-2024</option>
-                </select>
-            </div>
-            <div>
-                <label for="residency" class="block text-sm font-medium text-gray-700 mb-1">Residency Status</label>
-                <select id="residency" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    <option value="resident">Permanent Resident/Citizen</option>
-                    <option value="temporary">Temporary Resident</option>
-                </select>
-            </div>
-            <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="grossSalary" class="block text-sm font-medium text-gray-700 mb-1">Gross Annual Salary ($)</label>
-                    <input type="number" id="grossSalary" placeholder="e.g., 80000" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="fullName" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                 </div>
                 <div>
-                    <label for="payg" class="block text-sm font-medium text-gray-700 mb-1">Total PAYG Withheld ($)</label>
-                    <input type="number" id="payg" placeholder="e.g., 18000" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <label for="occupation" class="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
+                    <input type="text" id="occupation" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                 <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" id="email" placeholder="you@example.com" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label for="contactNumber" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                    <input type="tel" id="contactNumber" placeholder="04XX XXX XXX" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label for="financialYear" class="block text-sm font-medium text-gray-700 mb-1">Financial Year</label>
+                    <select id="financialYear" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="2023-2024">2023-2024</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="residency" class="block text-sm font-medium text-gray-700 mb-1">Residency Status</label>
+                    <select id="residency" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="resident">Permanent Resident/Citizen</option>
+                        <option value="temporary">Temporary Resident</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="grossSalary" class="block text-sm font-medium text-gray-700 mb-1">Gross Annual Salary ($)</label>
+                        <input type="number" id="grossSalary" placeholder="e.g., 80000" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="payg" class="block text-sm font-medium text-gray-700 mb-1">Total PAYG Withheld ($)</label>
+                        <input type="number" id="payg" placeholder="e.g., 18000" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medicare Levy Surcharge Section -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Medicare Levy Surcharge (MLS)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" id="privateHealthCover" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">I had an appropriate level of private patient hospital cover for the full financial year.</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="spouseIncome" class="block text-sm font-medium text-gray-700 mb-1">Spouse's Income ($)</label>
+                        <input type="number" id="spouseIncome" placeholder="e.g., 60000" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="dependentChildren" class="block text-sm font-medium text-gray-700 mb-1">Number of Dependent Children</label>
+                        <input type="number" id="dependentChildren" placeholder="e.g., 2" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                </div>
+                 <!-- MLS Rules Accordion -->
+                <div class="mt-4">
+                    <button type="button" id="accordion-button-mls" class="w-full flex justify-between items-center text-left text-sm font-medium text-gray-600 hover:text-blue-600 focus:outline-none">
+                        <span>What is the Medicare Levy Surcharge?</span>
+                        <svg class="w-5 h-5 text-gray-500 arrow-mls" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="accordion-content-mls" class="accordion-content-mls mt-2 text-xs text-gray-600 prose max-w-none">
+                        <p>The Medicare Levy Surcharge (MLS) is an extra tax paid by Australian taxpayers who don't have an appropriate level of private hospital cover and earn above a certain income.</p>
+                        <h4 class="font-semibold mt-2">FY2025 MLS Thresholds & Rates</h4>
+                        <p class="font-semibold">For Singles:</p>
+                        <ul class="list-disc pl-5">
+                            <li><strong>$0 – $97,000:</strong> 0%</li>
+                            <li><strong>$97,001 – $113,000:</strong> 1.0%</li>
+                            <li><strong>$113,001 – $151,000:</strong> 1.25%</li>
+                            <li><strong>$151,001 or more:</strong> 1.5%</li>
+                        </ul>
+                        <p class="font-semibold mt-2">For Families:</p>
+                        <ul class="list-disc pl-5">
+                            <li><strong>$0 – $194,000:</strong> 0%</li>
+                            <li><strong>$194,001 – $226,000:</strong> 1.0%</li>
+                            <li><strong>$226,001 – $302,000:</strong> 1.25%</li>
+                            <li><strong>$302,001 or more:</strong> 1.5%</li>
+                        </ul>
+                        <p>The family income threshold is increased by $1,500 for each dependent child after the first.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -106,6 +164,10 @@
                  <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
                      <span class="text-gray-600">Medicare Levy (2%):</span>
                      <span id="medicareLevy" class="font-semibold text-gray-800">$0.00</span>
+                 </div>
+                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                     <span class="text-gray-600">Medicare Levy Surcharge:</span>
+                     <span id="medicareLevySurcharge" class="font-semibold text-gray-800">$0.00</span>
                  </div>
                  <div class="flex justify-between items-center bg-blue-100 p-4 rounded-lg">
                      <span class="font-bold text-blue-800">Total Tax Liability:</span>
@@ -142,60 +204,110 @@
         let finalAmountForPdf = 0; // Store final amount for PDF
 
         const formatCurrency = (value) => Math.abs(value).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
+        
+        // MLS Accordion functionality
+        const accordionBtn = document.getElementById('accordion-button-mls');
+        const accordionContent = document.getElementById('accordion-content-mls');
+        const accordionArrow = accordionBtn.querySelector('.arrow-mls');
+
+        accordionBtn.addEventListener('click', () => {
+            const isExpanded = accordionContent.style.maxHeight && accordionContent.style.maxHeight !== '0px';
+            if (isExpanded) {
+                accordionContent.style.maxHeight = '0px';
+                accordionArrow.style.transform = 'rotate(0deg)';
+            } else {
+                accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';
+                accordionArrow.style.transform = 'rotate(180deg)';
+            }
+        });
 
         calculateBtn.addEventListener('click', function() {
             const errorDiv = document.getElementById('error-message');
             errorDiv.textContent = '';
-            const grossSalary = parseFloat(document.getElementById('grossSalary').value);
-            const payg = parseFloat(document.getElementById('payg').value);
+            
+            // --- Get all input values ---
+            const grossSalary = parseFloat(document.getElementById('grossSalary').value) || 0;
+            const payg = parseFloat(document.getElementById('payg').value) || 0;
             const residency = document.getElementById('residency').value;
             const financialYear = document.getElementById('financialYear').value;
+            const hasPrivateCover = document.getElementById('privateHealthCover').checked;
+            const spouseIncome = parseFloat(document.getElementById('spouseIncome').value) || 0;
+            const dependentChildren = parseInt(document.getElementById('dependentChildren').value) || 0;
+
             const resultsDiv = document.getElementById('results');
 
-            if (isNaN(grossSalary) || isNaN(payg) || grossSalary < 0 || payg < 0) {
+            if (grossSalary < 0 || payg < 0) {
                  errorDiv.textContent = 'Please enter valid positive numbers for salary and PAYG.';
                  resultsDiv.classList.remove('show');
                  printBtn.style.display = 'none';
                  return;
             }
 
+            // --- Taxable income (simplified) ---
+            const taxableIncome = grossSalary;
+
+            // --- Basic Income Tax Calculation ---
             let taxPayable = 0;
             if (financialYear === '2024-2025') {
-                if (grossSalary > 18200) {
-                    if (grossSalary <= 45000) taxPayable = (grossSalary - 18200) * 0.16;
-                    else if (grossSalary <= 135000) taxPayable = 4288 + (grossSalary - 45000) * 0.30;
-                    else if (grossSalary <= 190000) taxPayable = 31288 + (grossSalary - 135000) * 0.37;
-                    else taxPayable = 51638 + (grossSalary - 190000) * 0.45;
+                if (taxableIncome > 18200) {
+                    if (taxableIncome <= 45000) taxPayable = (taxableIncome - 18200) * 0.16;
+                    else if (taxableIncome <= 135000) taxPayable = 4288 + (taxableIncome - 45000) * 0.30;
+                    else if (taxableIncome <= 190000) taxPayable = 31288 + (taxableIncome - 135000) * 0.37;
+                    else taxPayable = 51638 + (taxableIncome - 190000) * 0.45;
                 }
             } else { // 2023-2024
-                if (grossSalary > 18200) {
-                    if (grossSalary <= 45000) taxPayable = (grossSalary - 18200) * 0.19;
-                    else if (grossSalary <= 120000) taxPayable = 5092 + (grossSalary - 45000) * 0.325;
-                    else if (grossSalary <= 180000) taxPayable = 29467 + (grossSalary - 120000) * 0.37;
-                    else taxPayable = 51667 + (grossSalary - 180000) * 0.45;
+                if (taxableIncome > 18200) {
+                    if (taxableIncome <= 45000) taxPayable = (taxableIncome - 18200) * 0.19;
+                    else if (taxableIncome <= 120000) taxPayable = 5092 + (taxableIncome - 45000) * 0.325;
+                    else if (taxableIncome <= 180000) taxPayable = 29467 + (taxableIncome - 120000) * 0.37;
+                    else taxPayable = 51667 + (taxableIncome - 180000) * 0.45;
                 }
             }
 
+            // --- Low Income Tax Offset (LITO) ---
             let lito = 0;
-            if (grossSalary <= 37500) lito = 700;
-            else if (grossSalary <= 45000) lito = 700 - (grossSalary - 37500) * 0.05;
-            else if (grossSalary <= 66667) lito = 325 - (grossSalary - 45000) * 0.015;
+            if (taxableIncome <= 37500) lito = 700;
+            else if (taxableIncome <= 66667) lito = 700 - (taxableIncome - 37500) * 0.05;
             lito = Math.max(0, lito);
 
+            // --- Medicare Levy ---
             let medicareLevy = 0;
             if (residency === 'resident') {
                  const medicareThresholdLower = 24276;
                  const medicareThresholdUpper = 30345;
-                 if (grossSalary > medicareThresholdLower && grossSalary <= medicareThresholdUpper) medicareLevy = (grossSalary - medicareThresholdLower) * 0.10;
-                 else if (grossSalary > medicareThresholdUpper) medicareLevy = grossSalary * 0.02;
+                 if (taxableIncome > medicareThresholdLower && taxableIncome <= medicareThresholdUpper) medicareLevy = (taxableIncome - medicareThresholdLower) * 0.10;
+                 else if (taxableIncome > medicareThresholdUpper) medicareLevy = taxableIncome * 0.02;
             }
 
-            const totalTaxLiability = Math.max(0, taxPayable - lito) + medicareLevy;
+            // --- Medicare Levy Surcharge (MLS) ---
+            let mls = 0;
+            const incomeForMls = taxableIncome + spouseIncome;
+            if (residency === 'resident' && !hasPrivateCover) {
+                const isFamily = spouseIncome > 0 || dependentChildren > 0;
+                if (!isFamily) { // Singles
+                    if (incomeForMls > 151000) mls = taxableIncome * 0.015;
+                    else if (incomeForMls > 113000) mls = taxableIncome * 0.0125;
+                    else if (incomeForMls > 97000) mls = taxableIncome * 0.01;
+                } else { // Families
+                    const familyThresholdIncrease = dependentChildren > 1 ? (dependentChildren - 1) * 1500 : 0;
+                    const tier1 = 194000 + familyThresholdIncrease;
+                    const tier2 = 226000 + familyThresholdIncrease;
+                    const tier3 = 302000 + familyThresholdIncrease;
+                    if (incomeForMls > tier3) mls = taxableIncome * 0.015;
+                    else if (incomeForMls > tier2) mls = taxableIncome * 0.0125;
+                    else if (incomeForMls > tier1) mls = taxableIncome * 0.01;
+                }
+            }
+            
+            // --- Final Calculation ---
+            const totalTaxLiability = Math.max(0, taxPayable - lito) + medicareLevy + mls;
             finalAmountForPdf = totalTaxLiability - payg;
 
+            // --- Display Results on Page ---
             document.getElementById('taxPayable').textContent = formatCurrency(taxPayable);
             document.getElementById('lito').textContent = `- ${formatCurrency(lito)}`;
             document.getElementById('medicareLevy').textContent = formatCurrency(medicareLevy);
+            document.getElementById('medicareLevySurcharge').textContent = formatCurrency(mls);
             document.getElementById('totalTax').textContent = formatCurrency(totalTaxLiability);
             document.getElementById('paygWithheld').textContent = `- ${formatCurrency(payg)}`;
 
@@ -228,9 +340,17 @@
             const grossSalary = isNaN(grossSalaryVal) ? '$0.00' : formatCurrency(grossSalaryVal);
             const payg = isNaN(paygVal) ? '$0.00' : formatCurrency(paygVal);
 
+            // Get MLS-related values for PDF
+            const hasPrivateCover = document.getElementById('privateHealthCover').checked ? 'Yes' : 'No';
+            const spouseIncomeVal = parseFloat(document.getElementById('spouseIncome').value);
+            const spouseIncome = isNaN(spouseIncomeVal) ? 'N/A' : formatCurrency(spouseIncomeVal);
+            const dependentChildren = document.getElementById('dependentChildren').value || '0';
+
+
             const taxPayable = document.getElementById('taxPayable').textContent;
             const lito = document.getElementById('lito').textContent;
             const medicareLevy = document.getElementById('medicareLevy').textContent;
+            const mls = document.getElementById('medicareLevySurcharge').textContent;
             const totalTax = document.getElementById('totalTax').textContent;
             
             let finalResultText = finalAmountForPdf < 0 ? "Estimated Tax Refund:" : "Estimated Tax Payable:";
@@ -254,44 +374,51 @@
             doc.line(20, 47, 190, 47);
 
             doc.setFontSize(11);
-            doc.text(`Full Name: ${fullName}`, 20, 57);
-            doc.text(`Occupation: ${occupation}`, 120, 57);
-            doc.text(`Email: ${email}`, 20, 64);
-            doc.text(`Contact No: ${contactNumber}`, 120, 64);
-            doc.text(`Financial Year: ${financialYear}`, 20, 71);
-            doc.text(`Residency Status: ${residency}`, 120, 71);
-            doc.text(`Gross Annual Salary: ${grossSalary}`, 20, 78);
-            doc.text(`PAYG Withheld: ${payg}`, 120, 78);
+            let y = 57;
+            doc.text(`Full Name: ${fullName}`, 20, y);
+            doc.text(`Occupation: ${occupation}`, 120, y); y += 7;
+            doc.text(`Email: ${email}`, 20, y);
+            doc.text(`Contact No: ${contactNumber}`, 120, y); y += 7;
+            doc.text(`Financial Year: ${financialYear}`, 20, y);
+            doc.text(`Residency Status: ${residency}`, 120, y); y += 7;
+            doc.text(`Gross Annual Salary: ${grossSalary}`, 20, y);
+            doc.text(`PAYG Withheld: ${payg}`, 120, y); y += 7;
+            doc.text(`Private Health Cover: ${hasPrivateCover}`, 20, y);
+            doc.text(`Spouse's Income: ${spouseIncome}`, 120, y); y += 7;
+            doc.text(`Dependent Children: ${dependentChildren}`, 20, y);
 
+            y += 15;
             doc.setFontSize(14);
-            doc.text("Calculation Breakdown", 20, 97);
-            doc.line(20, 99, 190, 99); 
+            doc.text("Calculation Breakdown", 20, y); y += 2;
+            doc.line(20, y, 190, y); y+= 6;
 
             doc.setFontSize(11);
-            doc.text(`Basic Income Tax:`, 20, 107);
-            doc.text(taxPayable, 190, 107, { align: 'right' });
-            doc.text(`Low Income Tax Offset:`, 20, 114);
-            doc.text(lito, 190, 114, { align: 'right' });
-            doc.text(`Medicare Levy:`, 20, 121);
-            doc.text(medicareLevy, 190, 121, { align: 'right' });
+            doc.text(`Basic Income Tax:`, 20, y);
+            doc.text(taxPayable, 190, y, { align: 'right' }); y += 7;
+            doc.text(`Low Income Tax Offset:`, 20, y);
+            doc.text(lito, 190, y, { align: 'right' }); y += 7;
+            doc.text(`Medicare Levy:`, 20, y);
+            doc.text(medicareLevy, 190, y, { align: 'right' }); y += 7;
+            doc.text(`Medicare Levy Surcharge:`, 20, y);
+            doc.text(mls, 190, y, { align: 'right' }); y += 6;
 
-            doc.line(20, 127, 190, 127);
+            doc.line(20, y, 190, y); y += 7;
             
             doc.setFont("helvetica", "bold");
-            doc.text(`Total Tax Liability:`, 20, 134);
-            doc.text(totalTax, 190, 134, { align: 'right' });
+            doc.text(`Total Tax Liability:`, 20, y);
+            doc.text(totalTax, 190, y, { align: 'right' }); y += 7;
             doc.setFont("helvetica", "normal");
-            doc.text(`Less PAYG Withheld:`, 20, 141);
-            doc.text(document.getElementById('paygWithheld').textContent, 190, 141, { align: 'right' });
+            doc.text(`Less PAYG Withheld:`, 20, y);
+            doc.text(document.getElementById('paygWithheld').textContent, 190, y, { align: 'right' }); y+= 11;
 
             doc.setFontSize(16);
             doc.setFont("helvetica", "bold");
-            doc.line(20, 152, 190, 152);
+            doc.line(20, y, 190, y); y+= 8;
 
             if (finalAmountForPdf < 0) doc.setTextColor(22, 163, 74); // Green
             else doc.setTextColor(220, 38, 38); // Red
-            doc.text(finalResultText, 20, 160);
-            doc.text(finalResultAmount, 190, 160, { align: 'right' });
+            doc.text(finalResultText, 20, y);
+            doc.text(finalResultAmount, 190, y, { align: 'right' });
             doc.setTextColor(0); // Reset color
 
             // --- PDF Footer ---
