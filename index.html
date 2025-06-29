@@ -40,13 +40,11 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen py-6 sm:py-12">
     <div class="w-full max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg my-8">
-        <!-- Header -->
         <div class="text-center mb-8">
             <h1 class="text-3xl sm:text-4xl font-bold text-blue-600">J2K Accounting</h1>
             <p class="text-gray-500 mt-2">Your Trusted Partner in Tax & Accounting</p>
         </div>
 
-        <!-- Input Form -->
         <div class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -91,9 +89,8 @@
                 </div>
             </div>
 
-            <!-- Medicare Levy Surcharge Section -->
             <div class="mt-6 pt-6 border-t border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Medicare Levy Surcharge (MLS)</h3>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Medicare Levy & Surcharge (MLS)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
                         <label class="flex items-center space-x-3">
@@ -110,8 +107,7 @@
                         <input type="number" id="dependentChildren" placeholder="e.g., 2" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                     </div>
                 </div>
-                 <!-- MLS Rules Accordion -->
-                <div class="mt-4">
+                 <div class="mt-4">
                     <button type="button" id="accordion-button-mls" class="w-full flex justify-between items-center text-left text-sm font-medium text-gray-600 hover:text-blue-600 focus:outline-none">
                         <span>What is the Medicare Levy Surcharge?</span>
                         <svg class="w-5 h-5 text-gray-500 arrow-mls" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -139,7 +135,6 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
             <button id="calculateBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition duration-300">
                 Calculate Estimate
@@ -149,7 +144,6 @@
             </button>
         </div>
 
-        <!-- Results Display -->
         <div id="results" class="mt-8 pt-6 border-t border-gray-200 result-card">
              <h2 class="text-2xl font-bold text-gray-800 mb-4">Calculation Results</h2>
              <div class="space-y-3">
@@ -179,12 +173,10 @@
                  </div>
              </div>
              <div id="finalResult" class="mt-6 p-5 rounded-lg text-center">
-                 <!-- Result will be injected here -->
-             </div>
+                 </div>
         </div>
         <div id="error-message" class="mt-4 text-center text-red-500 font-medium"></div>
 
-        <!-- Footer -->
         <div class="mt-10 pt-6 border-t border-gray-200 text-center text-gray-500">
             <h3 class="text-lg font-semibold text-gray-700">Contact J2K Accounting</h3>
             <p class="mt-2 text-sm">For professional advice on your tax and accounting needs, get in touch with us.</p>
@@ -245,6 +237,7 @@
 
             // --- Taxable income (simplified) ---
             const taxableIncome = grossSalary;
+            const familyIncome = grossSalary + spouseIncome;
 
             // --- Basic Income Tax Calculation ---
             let taxPayable = 0;
@@ -272,30 +265,47 @@
 
             // --- Medicare Levy ---
             let medicareLevy = 0;
+            const isFamily = spouseIncome > 0 || dependentChildren > 0;
+
             if (residency === 'resident') {
-                 const medicareThresholdLower = 24276;
-                 const medicareThresholdUpper = 30345;
-                 if (taxableIncome > medicareThresholdLower && taxableIncome <= medicareThresholdUpper) medicareLevy = (taxableIncome - medicareThresholdLower) * 0.10;
-                 else if (taxableIncome > medicareThresholdUpper) medicareLevy = taxableIncome * 0.02;
+                if (!isFamily) { // Individual Thresholds
+                     const medicareThresholdLower = (financialYear === '2023-2024') ? 24276 : 26000; // Example for 24-25, update with official numbers when available
+                     const medicareThresholdUpper = (financialYear === '2023-2024') ? 30345 : 32500; // Example for 24-25
+                     if (taxableIncome > medicareThresholdLower && taxableIncome <= medicareThresholdUpper) {
+                        medicareLevy = (taxableIncome - medicareThresholdLower) * 0.10;
+                     } else if (taxableIncome > medicareThresholdUpper) {
+                        medicareLevy = taxableIncome * 0.02;
+                     }
+                } else { // Family Thresholds
+                    const childIncrease = (financialYear === '2023-2024') ? 3760 : 4027; // ATO figures
+                    let familyThresholdLower = (financialYear === '2023-2024') ? 40939 : 43847; // ATO figures
+                    familyThresholdLower += dependentChildren * childIncrease;
+                    
+                    let familyThresholdUpper = familyThresholdLower * (1 / 0.9); // The upper limit is where the 10% phase-in meets the 2% rate
+
+                    if (familyIncome > familyThresholdLower && familyIncome <= familyThresholdUpper) {
+                        medicareLevy = (familyIncome - familyThresholdLower) * 0.10;
+                    } else if (familyIncome > familyThresholdUpper) {
+                        medicareLevy = taxableIncome * 0.02;
+                    }
+                }
             }
 
             // --- Medicare Levy Surcharge (MLS) ---
             let mls = 0;
-            const incomeForMls = taxableIncome + spouseIncome;
             if (residency === 'resident' && !hasPrivateCover) {
-                const isFamily = spouseIncome > 0 || dependentChildren > 0;
                 if (!isFamily) { // Singles
-                    if (incomeForMls > 151000) mls = taxableIncome * 0.015;
-                    else if (incomeForMls > 113000) mls = taxableIncome * 0.0125;
-                    else if (incomeForMls > 97000) mls = taxableIncome * 0.01;
+                    if (familyIncome > 151000) mls = taxableIncome * 0.015;
+                    else if (familyIncome > 113000) mls = taxableIncome * 0.0125;
+                    else if (familyIncome > 97000) mls = taxableIncome * 0.01;
                 } else { // Families
                     const familyThresholdIncrease = dependentChildren > 1 ? (dependentChildren - 1) * 1500 : 0;
                     const tier1 = 194000 + familyThresholdIncrease;
                     const tier2 = 226000 + familyThresholdIncrease;
                     const tier3 = 302000 + familyThresholdIncrease;
-                    if (incomeForMls > tier3) mls = taxableIncome * 0.015;
-                    else if (incomeForMls > tier2) mls = taxableIncome * 0.0125;
-                    else if (incomeForMls > tier1) mls = taxableIncome * 0.01;
+                    if (familyIncome > tier3) mls = taxableIncome * 0.015;
+                    else if (familyIncome > tier2) mls = taxableIncome * 0.0125;
+                    else if (familyIncome > tier1) mls = taxableIncome * 0.01;
                 }
             }
             
